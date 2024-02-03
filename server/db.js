@@ -1,8 +1,6 @@
 const  mongoose= require("mongoose");
-let db =mongoose.connect("mongodb://localhost:27017")
-if(db){
-    console.log("datatbase connected");
-}
+let db =mongoose.connect("mongodb://localhost:27017/PayTm-app")
+
 const schema = new mongoose.Schema({
     username:{
         type:String,
