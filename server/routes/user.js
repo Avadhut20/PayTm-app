@@ -4,7 +4,7 @@ const jwt =require('jsonwebtoken');
 const {JWT_SECRET}= require('../config')
 const authMiddleware = require('../middleware')
 
-const Users= require("../db")
+const {Users,Account} =require("../db")
 const validateSignup=z.object({
     username: z.string().email(),
     firstname:z.string(),
@@ -47,6 +47,13 @@ router.post("/signup", async function(req,res){
         });
         
         const user_id=newUser._id;
+
+        //Account 
+        await Account.create({
+            userId:user_id,
+            balance:1+Math.random()*10000
+        });
+
         console.log(user_id);
         const token=jwt.sign({
             user_id,
@@ -111,39 +118,29 @@ router.put("/", async (req, res) => {
     })
 })
 router.get("/bulk", async (req, res) => {
-    try {
-        const filter = req.query.filter || '';
+    const filter = req.query.filter || "";
 
-        // Using case-insensitive comparison for search
-        const users = await Users.find({
-            $or: [
-                { firstName: { $regex: new RegExp(filter, 'i') } },
-                { lastName: { $regex: new RegExp(filter, 'i') } }
-            ]
-        });
+    const users = await Users.find({
+        $or: [{
+            firstname: {
+                "$regex": filter
+            }
+        }, {
+            lastname: {
+                "$regex": filter
+            }
+        }]
+    })
 
-        console.log("Users:", users); // Log the users array
-
-        // Check if users array is empty
-        if (users.length === 0) {
-            return res.status(404).json({ message: 'No users found' });
-        }
-
-        // Send response
-        res.json({
-            users: users.map(user => ({
-                username: user.username,
-                firstName: user.firstname,
-                lastName: user.lastname,
-                _id: user._id
-            }))
-        });
-    } catch (error) {
-        console.error(error); // Log any errors that occur
-        res.status(500).json({ error: 'Internal server error' }); // Respond with an error status
-    }
-});
-
+    res.json({
+        user: users.map(user => ({
+            username: user.username,
+            firstName: user.firstname,
+            lastName: user.lastname,
+            _id: user._id
+        }))
+    })
+})
 
 
 module.exports=router;

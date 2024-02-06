@@ -22,17 +22,17 @@ const schema = new mongoose.Schema({
     },
 });
 
-const  accountSchema = new mongoose.schema({
-    userId:{
+const accountSchema = new mongoose.Schema({
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'Users',
-        required:true,
+        ref: 'Users',
+        required: true,
     },
-    balance:{
-        type:Number,
-        required:true,
+    balance: {
+        type: Number,
+        required: true,
     }
-})
+});
 const Users= mongoose.model("Users", schema);
 const Account = mongoose.model("Account ", accountSchema);
 module.exports={Users,Account};
